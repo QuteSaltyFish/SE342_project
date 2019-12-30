@@ -33,14 +33,14 @@ parser.add_argument(
     "--gpu", default=config["GPU"], type=str, help="choose which DEVICE U want to use")
 parser.add_argument("--epoch", default=0, type=int,
                     help="The epoch to be tested")
-parser.add_argument("--name", default='test', type=str,
+parser.add_argument("--name", default='all', type=str,
                     help="Whether to test after training")
 args = parser.parse_args()
 
 
 # using K-fold
 np.random.seed(1998)
-kf = KFold(n_splits=5)
+kf = KFold(n_splits=1)
 idx = np.arange(11)
 np.random.shuffle(idx)
 print(kf.get_n_splits(idx))
@@ -58,9 +58,9 @@ for K_idx, [train_idx, test_idx] in enumerate(kf.split(idx)):
 
     model = UNet(3, 4).to(DEVICE)
 
-    optimizer = t.optim.SGD(model.parameters(), lr=LR)
+    # optimizer = t.optim.SGD(model.parameters(), lr=LR)
     print(optimizer.param_groups[0]['lr'])
-    # optimizer = t.optim.Adam(model.parameters())
+    optimizer = t.optim.Adam(model.parameters())
     criterian = t.nn.CrossEntropyLoss().to(DEVICE)
 
     # Test the train_loader

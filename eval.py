@@ -7,7 +7,7 @@ import multiprocessing
 
 from model.dataloader import *
 from model.unet_model import UNet
-from model.func import save_model, eval_model_new_thread, eval_model, load_model
+from model.func import save_model, eval_model_new_thread, eval_model, load_model, paint
 import argparse
 from tensorboardX import SummaryWriter
 from sklearn.model_selection import KFold
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     model = UNet(3, 4).to(DEVICE)
     # Test the train_loader
     model.load_state_dict(
-        t.load("saved_model/test_1_folds/59.pkl"))
+        t.load("saved_model/all/2420.pkl"))
     model.eval()
 
     with t.no_grad():
@@ -52,8 +52,10 @@ if __name__ == "__main__":
             out = out.view(-1, 4)
 
             pred = out.max(1, keepdim=True)[1]
+            pred = pred.view(4032//config['k'], 3024//config['k'])
             print(t.max(pred))
             pred = pred.cpu().to(t.uint8).squeeze()
             print(t.max(pred))
-            # tv.transforms.ToPILImage()(pred).save('test.png')
+            pred = paint(pred)
+            tv.transforms.ToPILImage()(pred).save('test.png')
             print('DEBUG')

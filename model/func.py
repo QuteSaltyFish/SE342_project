@@ -8,6 +8,24 @@ import torchvision as tv
 from model import dataloader
 
 
+def paint(data):
+    r = t.tensor([1, 0, 0])
+    g = t.tensor([0, 1, 0])
+    b = t.tensor([0, 0, 1])
+
+    output = t.zeros([data.shape[0], data.shape[1], 3])
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            if data[i, j] == 1:
+                output[i, j] = r
+            elif data[i, j] == 2:
+                output[i, j] = g
+            elif data[i, j] == 3:
+                output[i, j] = b
+    output = output.permute(2, 0, 1)
+    return output
+
+
 def save_model(model, epoch, dir):
     DIR = 'saved_model/'+dir
     if not os.path.exists(DIR):
