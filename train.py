@@ -3,6 +3,7 @@ import os
 from model.unet_model import UNet
 import torch as t
 import torchvision as tv
+
 # %%
 import json
 import time
@@ -33,22 +34,25 @@ parser.add_argument(
     "--gpu", default=config["GPU"], type=str, help="choose which DEVICE U want to use")
 parser.add_argument("--epoch", default=0, type=int,
                     help="The epoch to be tested")
+parser.add_argument("--lr", default=LR, type=float,
+                    help="Learning Rate")
 parser.add_argument("--name", default='all', type=str,
                     help="Whether to test after training")
 args = parser.parse_args()
-
+LR = args.lr
 
 # using K-fold
 np.random.seed(1998)
-kf = KFold(n_splits=1)
-idx = np.arange(11)
+kf = KFold(n_splits=5)
+idx = np.arange(len(np.array(os.listdir(config["Taining_Dir"]))))
 np.random.shuffle(idx)
 print(kf.get_n_splits(idx))
 # shuffle the data before the
 for K_idx, [train_idx, test_idx] in enumerate(kf.split(idx)):
     writer = SummaryWriter('runs/{}_{}_Fold'.format(args.name, K_idx+1))
 
-    train_data, test_data = data_set(train_idx), data_set(test_idx)
+    train_data, test_data = data_set(
+        train_idx, train=True), data_set(test_idx, train=False)
     # train_data.data_argumentation()
 
     train_loader = DataLoader.DataLoader(
@@ -58,9 +62,9 @@ for K_idx, [train_idx, test_idx] in enumerate(kf.split(idx)):
 
     model = UNet(3, 4).to(DEVICE)
 
-    # optimizer = t.optim.SGD(model.parameters(), lr=LR)
+    optimizer = t.optim.SGD(model.parameters(), lr=LR)
     print(optimizer.param_groups[0]['lr'])
-    optimizer = t.optim.Adam(model.parameters())
+    # optimizer = t.optim.Adam(model.parameters())
     criterian = t.nn.CrossEntropyLoss().to(DEVICE)
 
     # Test the train_loader
@@ -139,7 +143,7 @@ testing_acc = np.zeros(EPOCH, dtype=np.float)
 
 # compute the mean acc and loss
 dirs = ['runs/{}_{}_Fold'.format(args.name, i+1) for i in range(5)]
-writer = SummaryWriter('runs/{}'.format(args.name))
+writer = SummaryWriter('runs_summary/{}'.format(args.name))
 for dir in dirs:
     try:
         data = os.listdir(dir)
