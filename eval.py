@@ -25,16 +25,17 @@ if __name__ == "__main__":
                         help="The epoch to be tested")
     args = parser.parse_args()
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
-    test_set = data_set(np.arange(11))
+    test_set = data_set(
+        np.arange(len(np.array(os.listdir(config["Taining_Dir"])))), train=False)
     test_loader = DataLoader.DataLoader(
         test_set, batch_size=1, shuffle=False, num_workers=config["num_workers"])
 
     model = UNet(3, 4).to(DEVICE)
     # Test the train_loader
     model.load_state_dict(
-        t.load("saved_model/all/2420.pkl"))
+        t.load("saved_model/all/3990.pkl"))
     model.eval()
 
     with t.no_grad():
@@ -57,5 +58,6 @@ if __name__ == "__main__":
             pred = pred.cpu().to(t.uint8).squeeze()
             print(t.max(pred))
             pred = paint(pred)
-            tv.transforms.ToPILImage()(pred).save('test.png')
+            tv.transforms.ToPILImage()(pred).save(
+                'data/result/result{}.png'.format(batch_idx+1))
             print('DEBUG')
