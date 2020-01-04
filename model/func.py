@@ -94,6 +94,7 @@ def output(dir):
         if not os.path.exists('final_output'):
             os.makedirs('final_output')
         tv.transforms.ToPILImage()(pred).save('final_output/{}.png'.format(name))
+        return pred.numpy()
         # print('DEBUG')
 
 

@@ -16,6 +16,6 @@ if __name__ == "__main__":
     names = np.array(os.listdir(data_root))
     # dirs = ['data/image/img{}.jpg'.format(i) for i in range(1,25)]
     for i in range(len(names)):
-        output(os.path.join(data_root, names[i]))
+        output_numpy = output(os.path.join(data_root, names[i]))
 
 
