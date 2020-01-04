@@ -8,6 +8,8 @@ import torchvision as tv
 from model import dataloader
 from PIL import Image
 from model.unet_model import UNet
+
+
 def paint(data):
     r = t.tensor([1, 0, 0])
     g = t.tensor([0, 1, 0])
@@ -53,6 +55,7 @@ def eval_model_new_thread(epoch, gpu):
     # os.system('nohup {} -u train_eval.py --epoch={} --gpu={} > {} 2>&1 &'.format(python_path, epoch, gpu[1],
     #  path_train + '/{}.out'.format(epoch)))
 
+
 def output(dir):
     config = json.load(open("config.json"))
     DEVICE = t.device('cpu')
@@ -60,20 +63,20 @@ def output(dir):
     name = os.path.splitext(name)[0]
     index = int(name.strip('img'))
     transform = tv.transforms.Compose([
-            tv.transforms.Resize(
-                [4032//config['k'], 3024//config['k']]),
-            tv.transforms.ToTensor()
-        ])
+        tv.transforms.Resize(
+            [4032//config['k'], 3024//config['k']]),
+        tv.transforms.ToTensor()
+    ])
 
     data = Image.open(dir)
-   
+
     data = transform(data)
     model = UNet(3, 4).to(DEVICE)
     # Test the train_loader
-    if (1<=index<=11):
+    if (1 <= index <= 11):
         model.load_state_dict(
             t.load("model/model1.pkl"))
-    elif(12<=index<=24):
+    elif(12 <= index <= 24):
         model.load_state_dict(
             t.load("model/model2.pkl"))
     model.eval()
@@ -94,7 +97,7 @@ def output(dir):
         if not os.path.exists('final_output'):
             os.makedirs('final_output')
         tv.transforms.ToPILImage()(pred).save('final_output/{}.png'.format(name))
-        return pred.numpy()
+        return pred.permute(1, 2, 0).numpy()
         # print('DEBUG')
 
 
