@@ -1,8 +1,8 @@
 import cv2 as cv
 import numpy as np
 
-def closeopen_demor(src):
-   r, g, b = cv.split(src)
+def closeopen_demor(self):
+   r, g, b = cv.split(self.img)
    gray = r
    ret, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
    kernel = cv.getStructuringElement(cv.MORPH_RECT, (15, 15))
@@ -18,4 +18,4 @@ def closeopen_demor(src):
    kernel = cv.getStructuringElement(cv.MORPH_RECT, (15, 15))
    binaryb = cv.morphologyEx(binary, cv.MORPH_OPEN, kernel)
    b2 = cv.morphologyEx(binaryb, cv.MORPH_CLOSE, kernel)
-   src = cv.merge([b2, g2, r2])
+   self.result = cv.merge([r2, g2, b2])
