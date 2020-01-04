@@ -72,10 +72,10 @@ def output(dir):
     # Test the train_loader
     if (1<=index<=11):
         model.load_state_dict(
-            t.load("saved_model/all/3990.pkl"))
+            t.load("model/model1.pkl"))
     elif(12<=index<=24):
         model.load_state_dict(
-            t.load("saved_model/all_v2/7990.pkl"))
+            t.load("model/model2.pkl"))
     model.eval()
 
     with t.no_grad():
