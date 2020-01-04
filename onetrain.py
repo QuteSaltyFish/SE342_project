@@ -24,8 +24,8 @@ config = json.load(open("config.json"))
 # os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 DEVICE = t.device(config["DEVICE"])
 LR = config['lr']
-LR = 1e-3
-EPOCH = 4000
+LR = 1e-4
+EPOCH = 8000
 BATCH_SIZE = config["batch_size"]
 WD = config['Weight_Decay']
 parser = argparse.ArgumentParser()
@@ -36,15 +36,15 @@ parser.add_argument("--epoch", default=0, type=int,
 parser.add_argument("--name", default='all_v2', type=str,
                     help="Whether to test after training")
 args = parser.parse_args()
-
+# os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 # using K-fold
 np.random.seed(1998)
-idx = np.arange(len(np.array(os.listdir(config["Taining_Dir"]))))
+idx = np.arange(11, len(np.array(os.listdir(config["Taining_Dir"]))))
 # shuffle the data before the
 writer = SummaryWriter('runs/{}'.format(args.name))
 
-train_data = data_set(idx, train=True)
+train_data = data_set(idx, train=False)
 # train_data.data_argumentation()
 
 train_loader = DataLoader.DataLoader(
@@ -52,7 +52,7 @@ train_loader = DataLoader.DataLoader(
 
 model = UNet(3, 4).to(DEVICE)
 if args.epoch != 0:
-    path = 'saved_model/all/{}.pkl'.format(args.epoch)
+    path = 'saved_model/{}/{}.pkl'.format(args.name, args.epoch)
     model.load_state_dict(t.load(path))
 optimizer = t.optim.SGD(model.parameters(), lr=LR)
 # optimizer = t.optim.Adam(model.parameters())

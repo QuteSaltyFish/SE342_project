@@ -130,4 +130,5 @@ dmypy.json
 runs/
 saved_model/
 Mask-RCNN/
+detectron2/
 run.sh

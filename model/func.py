@@ -6,8 +6,8 @@ import torch.utils.data.dataloader as DataLoader
 import torchvision as tv
 
 from model import dataloader
-
-
+from PIL import Image
+from model.unet_model import UNet
 def paint(data):
     r = t.tensor([1, 0, 0])
     g = t.tensor([0, 1, 0])
@@ -53,62 +53,48 @@ def eval_model_new_thread(epoch, gpu):
     # os.system('nohup {} -u train_eval.py --epoch={} --gpu={} > {} 2>&1 &'.format(python_path, epoch, gpu[1],
     #  path_train + '/{}.out'.format(epoch)))
 
+def output(dir):
+    config = json.load(open("config.json"))
+    DEVICE = t.device('cpu')
+    name = dir.split('/')[-1]
+    name = os.path.splitext(name)[0]
+    index = int(name.strip('img'))
+    transform = tv.transforms.Compose([
+            tv.transforms.Resize(
+                [4032//config['k'], 3024//config['k']]),
+            tv.transforms.ToTensor()
+        ])
 
-def eval_model(epoch, gpu='0'):
-    """
-    evaluate the model using multi threading
-    :param epoch: the model stored in the nth epoch
-    :param gpu: which gpu U tried to use
-    :return:
-    """
-    config = json.load(open('config.json'))
-    DEVICE = config['DEVICE'] + ':' + gpu
-    # os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-
-    train_data = Mydataloader.TrainingData()
-    train_loader = DataLoader.DataLoader(
-        train_data, batch_size=1, shuffle=False, num_workers=config["num_workers"])
-    test_data = Mydataloader.TestingData()
-    test_loader = DataLoader.DataLoader(
-        test_data, batch_size=1, shuffle=False, num_workers=config["num_workers"])
-
-    criterian = t.nn.MSELoss()
-    model = myNetwork.MyCNN(n_channels=8).to(DEVICE)
+    data = Image.open(dir)
+   
+    data = transform(data)
+    model = UNet(3, 4).to(DEVICE)
     # Test the train_loader
-    model = load_model(model, epoch)
-    model = model.eval()
+    if (1<=index<=11):
+        model.load_state_dict(
+            t.load("saved_model/all/3990.pkl"))
+    elif(12<=index<=24):
+        model.load_state_dict(
+            t.load("saved_model/all_v2/7990.pkl"))
+    model.eval()
 
     with t.no_grad():
-        # Test the test_loader
-        for batch_idx, [data, label] in enumerate(train_loader):
-            data = data.to(DEVICE)
-            out = model(data)
-            # monitor the upper and lower boundary of output
-            out_max = t.max(out)
-            out_min = t.min(out)
-            out = (out - out_min) / (out_max - out_min)
-            DIR = 'result/train_result/epoch_{}'.format(epoch)
-            if not os.path.exists(DIR):
-                os.makedirs(DIR)
-            OUTPUT = t.cat([data, out], dim=3)
-            tv.transforms.ToPILImage()(OUTPUT.squeeze().cpu()).save(
-                DIR + '/idx_{}.jpg'.format(batch_idx))
+        data = data.to(DEVICE).unsqueeze(0)
+        out = model(data).squeeze()
 
-    with t.no_grad():
-        # Test the test_loader
-        for batch_idx, data in enumerate(test_loader):
-            data = data.to(DEVICE)
-            out = model(data)
-            # monitor the upper and lower boundary of output
-            out_max = t.max(out)
-            out_min = t.min(out)
-            out = (out - out_min) / (out_max - out_min)
-            DIR = 'result/test_result/epoch_{}'.format(epoch)
-            if not os.path.exists(DIR):
-                os.makedirs(DIR)
-            OUTPUT = t.cat([data, out], dim=3)
-            tv.transforms.ToPILImage()(OUTPUT.squeeze().cpu()).save(
-                DIR + '/idx_{}.jpg'.format(batch_idx))
+        out = out.permute(1, 2, 0)
+        out = out.view(-1, 4)
+
+        pred = out.max(1, keepdim=True)[1]
+        pred = pred.view(4032//config['k'], 3024//config['k'])
+        print(t.max(pred))
+        pred = pred.cpu().to(t.uint8).squeeze()
+        print(t.max(pred))
+        pred = paint(pred)
+        if not os.path.exists('final_output'):
+            os.makedirs('final_output')
+        tv.transforms.ToPILImage()(pred).save('final_output/{}.png'.format(name))
+        # print('DEBUG')
 
 
 if __name__ == '__main__':

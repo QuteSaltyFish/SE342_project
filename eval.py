@@ -7,7 +7,7 @@ import multiprocessing
 
 from model.dataloader import *
 from model.unet_model import UNet
-from model.func import save_model, eval_model_new_thread, eval_model, load_model, paint
+from model.func import save_model, load_model, paint
 import argparse
 from tensorboardX import SummaryWriter
 from sklearn.model_selection import KFold
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     model = UNet(3, 4).to(DEVICE)
     # Test the train_loader
     model.load_state_dict(
-        t.load("saved_model/all/3990.pkl"))
+        t.load("saved_model/all_v2/2600.pkl"))
     model.eval()
 
     with t.no_grad():
