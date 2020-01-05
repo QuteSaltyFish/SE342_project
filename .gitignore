@@ -131,4 +131,6 @@ runs/
 saved_model/
 Mask-RCNN/
 detectron2/
+runs_summary/
 run.sh
+networkoutput.py
