@@ -134,3 +134,7 @@ detectron2/
 runs_summary/
 run.sh
 networkoutput.py
+data/
+eval.py
+networkoutput.py
+onetrain.py

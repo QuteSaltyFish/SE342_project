@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(707, 544)
+        #Dialog.resize(707, 544)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
         self.label = QtWidgets.QLabel(Dialog)
@@ -42,6 +42,6 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Result"))
         self.label.setText(_translate("Dialog", "R:UP\n"
-"G:DOWN\n"
-"B-EDGE"))
+"G:EDGE\n"
+"B:DOWN"))
         self.labelResult.setText(_translate("Dialog", "TextLabel"))

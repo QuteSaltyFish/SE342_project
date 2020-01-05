@@ -25,7 +25,7 @@ config = json.load(open("config.json"))
 DEVICE = t.device(config["DEVICE"])
 LR = config['lr']
 LR = 1e-3
-EPOCH = 8000
+EPOCH = 4000
 BATCH_SIZE = config["batch_size"]
 WD = config['Weight_Decay']
 parser = argparse.ArgumentParser()
@@ -33,14 +33,14 @@ parser.add_argument(
     "--gpu", default=config["GPU"], type=str, help="choose which DEVICE U want to use")
 parser.add_argument("--epoch", default=0, type=int,
                     help="The epoch to start from")
-parser.add_argument("--name", default='all_v5', type=str,
+parser.add_argument("--name", default='all_v5.2', type=str,
                     help="Whether to test after training")
 args = parser.parse_args()
 # os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 # using K-fold
 np.random.seed(1998)
-idx = np.arange(11, len(np.array(os.listdir(config["Taining_Dir"]))))
+idx = np.arange(len(np.array(os.listdir(config["Taining_Dir"]))))
 # idx = np.arange(11)
 print(idx)
 # shuffle the data before the
@@ -53,6 +53,7 @@ train_loader = DataLoader.DataLoader(
     train_data, batch_size=BATCH_SIZE, shuffle=True, num_workers=config["num_workers"])
 
 model = UNet(3, 4).to(DEVICE)
+model.load_state_dict(t.load('model/model2.pkl'))
 if args.epoch != 0:
     path = 'saved_model/{}/{}.pkl'.format(args.name, args.epoch)
     model.load_state_dict(t.load(path))

@@ -45,7 +45,8 @@ class data_set(t.utils.data.Dataset):
             if label.height < label.width:
                 label = label.transpose(Image.ROTATE_90)
                 flag = not flag
-            assert flag
+            # assert flag
+            # data.save('data/newdata/{}'.format(self.names[index]))
             if self.train:
                 self.data_augrmentation(data, label)
             data, label = self.transform(
@@ -221,5 +222,5 @@ class In_the_wild_set(t.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = data_set(np.arange(11), train=False)
+    dataset = data_set(np.arange(24), train=False)
     print(len(dataset), dataset[1])
