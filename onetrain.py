@@ -12,7 +12,7 @@ import torch.utils.data.dataloader as DataLoader
 import multiprocessing
 
 from model.dataloader import *
-from model.func import save_model, eval_model_new_thread, eval_model, load_model
+from model.func import save_model, load_model
 import argparse
 from tensorboardX import SummaryWriter
 from sklearn.model_selection import KFold
@@ -24,7 +24,7 @@ config = json.load(open("config.json"))
 # os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 DEVICE = t.device(config["DEVICE"])
 LR = config['lr']
-LR = 1e-4
+LR = 1e-3
 EPOCH = 8000
 BATCH_SIZE = config["batch_size"]
 WD = config['Weight_Decay']
@@ -33,7 +33,7 @@ parser.add_argument(
     "--gpu", default=config["GPU"], type=str, help="choose which DEVICE U want to use")
 parser.add_argument("--epoch", default=0, type=int,
                     help="The epoch to start from")
-parser.add_argument("--name", default='all_v2', type=str,
+parser.add_argument("--name", default='all_v5', type=str,
                     help="Whether to test after training")
 args = parser.parse_args()
 # os.environ["CUDA_VISIBLE_DEVICES"] = '1'
@@ -41,6 +41,8 @@ args = parser.parse_args()
 # using K-fold
 np.random.seed(1998)
 idx = np.arange(11, len(np.array(os.listdir(config["Taining_Dir"]))))
+# idx = np.arange(11)
+print(idx)
 # shuffle the data before the
 writer = SummaryWriter('runs/{}'.format(args.name))
 
@@ -65,6 +67,8 @@ for epoch in range(args.epoch, EPOCH):
     model = model.train()
     train_loss = 0
     correct = 0
+    if epoch > 1500:
+        optimizer.param_groups[0]['lr'] = 1e-4
     for batch_idx, [data, label] in enumerate(train_loader):
         data, label = data.to(DEVICE), label.to(DEVICE)
         # print(t.max(data), t.max(label))
@@ -79,6 +83,11 @@ for epoch in range(args.epoch, EPOCH):
         train_loss += loss
         pred = out.max(1, keepdim=True)[1]  # 找到概率最大的下标
         correct += pred.eq(label.view_as(pred)).sum().item()
+
+        # tv.transforms.ToPILImage()(data.cpu().squeeze()).save('tmp1.jpg')
+        # tv.transforms.ToPILImage()(label.cpu().squeeze()).save('tmp2.jpg')
+        # tv.transforms.ToPILImage()(out.cpu().squeeze()).save('tmp3.jpg')
+
     train_loss /= len(train_loader.dataset)
     train_acc = 100. * correct / \
         len(train_loader.dataset)/(4032*3024//config['k']//config['k'])

@@ -69,9 +69,11 @@ def output(dir):
     ])
 
     data = Image.open(dir)
-
+    if data.height < data.width:
+        data = data.transpose(Image.ROTATE_90)
     data = transform(data)
     model = UNet(3, 4).to(DEVICE)
+    # model.load_state_dict(t.load("saved_model/all_v3/7990.pkl"))
     # Test the train_loader
     if (1 <= index <= 11):
         model.load_state_dict(
