@@ -1,6 +1,6 @@
 {
-    "Taining_Dir": "/home/wangmingke/Desktop/pictopick",
-    "Label_Path": "/home/wangmingke/Desktop/labeltopick",
+    "Taining_Dir": "MyData/image",
+    "Label_Path": "MyData/label",
     "_comment_": "The shape of the tensor feed into the network (namly HxW)",
     "k": 10,
     "_comment": "The GPU param is to the which GPU U want to use. If this is only one gpu, set it to 0.",

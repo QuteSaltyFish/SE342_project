@@ -52,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def imgRead(self):
         fname = QFileDialog.getOpenFileName(
-            directory='/home/wangmingke/Desktop/pictopick')
+            directory='MyData/image')
         if fname[0] == '':
             pass
         else:
@@ -83,7 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.result = (
                 output(os.path.join(data_root, names[i]))*255).astype(np.uint8)
             self.result = cv2.resize(
-                self.result, (self.result.shape[1]*3, self.result.shape[0]*3)) 
+                self.result, (self.result.shape[1]*3, self.result.shape[0]*3))
             self.closeopen_demor()
             self.result = img_label(cv2.resize(
                 self.img, self.result.shape[1::-1]), self.result)

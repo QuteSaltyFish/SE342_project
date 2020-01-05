@@ -77,10 +77,10 @@ def output(dir):
     # Test the train_loader
     if (1 <= index <= 11):
         model.load_state_dict(
-            t.load("model/model1.pkl"))
+            t.load("model/model1.pkl", map_location='cpu'))
     elif(12 <= index <= 24):
         model.load_state_dict(
-            t.load("model/model2.pkl"))
+            t.load("model/model2.pkl", map_location='cpu'))
     model.eval()
 
     with t.no_grad():
